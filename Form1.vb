@@ -11,6 +11,7 @@ Imports Google.Apis.Auth
 Imports Google.Apis.Download
 
 Public Class VentuDrive
+    Public DIR_FOTOS As String
     Dim begreen As Boolean = True
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -42,6 +43,7 @@ Public Class VentuDrive
 
         If (_FILES.Count = 0) Then
             ' Con esto creamos un directorio
+            '_FILES.Add(HELPER.createDirectory(Service, "" & direct & "", "" & direct & "", "root/d1"))
             _FILES.Add(HELPER.createDirectory(Service, "" & direct & "", "" & direct & "", "root"))
         End If
 
@@ -158,4 +160,130 @@ Public Class VentuDrive
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         CrearDirectorio()
     End Sub
+
+    Private Sub SelDir_Click(sender As Object, e As EventArgs) Handles SelDir.Click
+
+    End Sub
+
+    Private Sub Btn_organizar_Click(sender As Object, e As EventArgs) Handles Btn_organizar.Click
+        If My.Computer.FileSystem.DirectoryExists(DIR_FOTOS + "\Fotos_Organizadas\") = False Then
+            My.Computer.FileSystem.CreateDirectory(DIR_FOTOS + "\Fotos_Organizadas\")
+        End If
+
+
+        For Each Archivo As String In My.Computer.FileSystem.GetFiles(DIR_FOTOS, FileIO.SearchOption.SearchAllSubDirectories,
+                                "*.*")
+            'Dim fileCreatedDate As DateTime = System.IO.File.GetCreationTime(Archivo)
+            Dim fileCreatedDate As DateTime = System.IO.File.GetLastWriteTime(Archivo)
+
+            ' Dim FILEES As System.IO.File
+            ' FILEES.ToString = Archivo
+
+
+
+            Dim anyo As String
+            Dim mes As String
+            anyo = fileCreatedDate.Year
+
+            mes = fileCreatedDate.Month
+            If mes < 10 Then
+                mes = "0" & mes
+            End If
+
+            If My.Computer.FileSystem.DirectoryExists(DIR_FOTOS + "\Fotos_Organizadas\" + anyo) = False Then
+                My.Computer.FileSystem.CreateDirectory(DIR_FOTOS + "\Fotos_Organizadas\" + anyo)
+                If My.Computer.FileSystem.DirectoryExists(DIR_FOTOS + "\Fotos_Organizadas\" + anyo + "\" + mes) = False Then
+                    My.Computer.FileSystem.CreateDirectory(DIR_FOTOS + "\Fotos_Organizadas\" + anyo + "\" + mes)
+                End If
+            Else
+                If My.Computer.FileSystem.DirectoryExists(DIR_FOTOS + "\Fotos_Organizadas\" + anyo + "\" + mes) = False Then
+                    My.Computer.FileSystem.CreateDirectory(DIR_FOTOS + "\Fotos_Organizadas\" + anyo + "\" + mes)
+                End If
+
+            End If
+
+            Dim dir_mover As String = DIR_FOTOS + "\Fotos_Organizadas\" + anyo + "\" + mes
+
+
+            'Crea la carpeta para ir introducion las fotos que corresponde
+
+
+            'cuento los arvhivos que hay en la carpeta
+            Dim counter = My.Computer.FileSystem.GetFiles(dir_mover)
+
+            Dim NombreFinal = counter.Count + 1
+            'Muevo la foto
+            My.Computer.FileSystem.MoveFile(Archivo, dir_mover + "\20130710_222855_1.jpg")
+
+            'renombro la foto
+            My.Computer.FileSystem.RenameFile(dir_mover + "\20130710_222855_1.jpg", NombreFinal)
+
+        Next
+
+
+
+    End Sub
+
+    Private Sub btndirfotos_Click(sender As Object, e As EventArgs) Handles btndirfotos.Click
+        Dim oFD As New FolderBrowserDialog
+        oFD.ShowDialog()
+        Me.txtdirfotos.Text = oFD.SelectedPath
+        DIR_FOTOS = txtdirfotos.Text
+    End Sub
 End Class
+#Region "Comentado"
+
+
+'Public Class ExploradorCarpetasVB
+
+
+'    Public Sub cargarSubcarpetas(ByVal rutaRaiz As String,
+'              ByVal nodoTree As Windows.Forms.TreeNode)
+'        On Error Resume Next
+'        Dim carpetaActual As String
+'        Dim indice As Integer
+
+'        If nodoTree.Nodes.Count = 0 Then
+'            For Each carpetaActual In
+'                    My.Computer.FileSystem.GetDirectories(rutaRaiz)
+'                indice = carpetaActual.LastIndexOf(System.IO.Path.PathSeparator)
+'                nodoTree.Nodes.Add(carpetaActual.Substring(indice + 1,
+'                     carpetaActual.Length - indice - 1))
+'                nodoTree.LastNode.Tag = carpetaActual
+'                nodoTree.LastNode.ImageIndex = 0
+'            Next
+'        End If
+'    End Sub
+
+'    Public Sub cargarCarpetas(ByVal rutaRaiz As String)
+'        Dim nodoBase As System.Windows.Forms.TreeNode
+
+'        If IO.Directory.Exists(rutaRaiz) Then
+'            If rutaRaiz.Length <= 3 Then
+'                nodoBase = TreeView1.Nodes.Add(rutaRaiz)
+'            Else
+'                nodoBase = TreeView1.Nodes.Add(
+'                    My.Computer.FileSystem.GetName(rutaRaiz))
+'            End If
+'            nodoBase.Tag = rutaRaiz
+'            cargarSubcarpetas(rutaRaiz, nodoBase)
+'        Else
+'            Throw New System.IO.DirectoryNotFoundException()
+'        End If
+'    End Sub
+
+'    Private Sub Button1_Click(sender As System.Object,
+'               e As System.EventArgs) Handles Button1.Click
+'        cargarCarpetas(TextBox1.Text)
+'    End Sub
+
+'    Private Sub TreeView1_AfterExpand(sender As System.Object,
+'               e As System.Windows.Forms.TreeViewEventArgs) Handles TreeView1.AfterExpand
+'        Dim n As System.Windows.Forms.TreeNode
+'        For Each n In e.Node.Nodes
+'            cargarSubcarpetas(n.Tag, n)
+'        Next
+'    End Sub
+'End Class
+
+#End Region
