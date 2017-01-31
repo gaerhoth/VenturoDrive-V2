@@ -9,6 +9,7 @@ Imports Google.Apis.Services
 
 Imports Google.Apis.Auth
 Imports Google.Apis.Download
+Imports System.IO
 
 Public Class VentuDrive
     Public DIR_FOTOS As String
@@ -37,7 +38,7 @@ Public Class VentuDrive
 
         Dim Q As String = "title = '" & direct & "' and mimeType = 'application/vnd.google-apps.folder'"
 
-        Dim _FILES As List(Of File)
+        Dim _FILES As List(Of Google.Apis.Drive.v2.Data.File)
         'LISTAR
         _FILES = HELPER.GetFiles(Service, Q)
 
@@ -56,7 +57,7 @@ Public Class VentuDrive
 
         Dim Q As String = "title = 'VENTURO2Sample' and mimeType = 'application/vnd.google-apps.folder'"
 
-        Dim _FILES As List(Of File)
+        Dim _FILES As List(Of Google.Apis.Drive.v2.Data.File)
         'LISTAR
         _FILES = HELPER.GetFiles(Service, Q)
 
@@ -68,7 +69,7 @@ Public Class VentuDrive
         Dim directoryId As String
         directoryId = _FILES(0).Id
 
-        Dim NEWFILE As File
+        Dim NEWFILE As Google.Apis.Drive.v2.Data.File
         NEWFILE = HELPER.uploadFile(Service, "c:\a.pdf", directoryId)
 
 
@@ -110,7 +111,7 @@ Public Class VentuDrive
     Public Function UploadFile(item As String) As Boolean
         Try
             Dim filename = System.IO.Path.GetFileName(item)
-            Dim body = New File() With {
+            Dim body = New Google.Apis.Drive.v2.Data.File() With {
             .Title = filename,
             .Description = filename,
             .MimeType = (System.IO.Path.GetExtension(filename).TrimStart("."c)),
@@ -125,7 +126,7 @@ Public Class VentuDrive
 
             Dim request As FilesResource.InsertMediaUpload = Service.Files.Insert(body, stream, body.MimeType)
             request.Upload()
-            Dim uploadedfile As File = request.ResponseBody
+            Dim uploadedfile As Google.Apis.Drive.v2.Data.File = request.ResponseBody
 
             Dim success = uploadedfile IsNot Nothing AndAlso uploadedfile.Id.Length > 0
             If success Then
@@ -173,11 +174,13 @@ Public Class VentuDrive
 
         For Each Archivo As String In My.Computer.FileSystem.GetFiles(DIR_FOTOS, FileIO.SearchOption.SearchAllSubDirectories,
                                 "*.*")
-            'Dim fileCreatedDate As DateTime = System.IO.File.GetCreationTime(Archivo)
+
             Dim fileCreatedDate As DateTime = System.IO.File.GetLastWriteTime(Archivo)
 
-            ' Dim FILEES As System.IO.File
-            ' FILEES.ToString = Archivo
+            Dim Nom_archivo As String
+            Dim EXT_archivo As String
+            Nom_archivo = Path.GetFileName(Archivo)
+            EXT_archivo = Path.GetExtension(Archivo)
 
 
 
@@ -213,14 +216,14 @@ Public Class VentuDrive
 
             Dim NombreFinal = counter.Count + 1
             'Muevo la foto
-            My.Computer.FileSystem.MoveFile(Archivo, dir_mover + "\20130710_222855_1.jpg")
+            My.Computer.FileSystem.MoveFile(Archivo, dir_mover + "\" + Nom_archivo)
 
             'renombro la foto
-            My.Computer.FileSystem.RenameFile(dir_mover + "\20130710_222855_1.jpg", NombreFinal)
+            My.Computer.FileSystem.RenameFile(dir_mover + "\" + Nom_archivo, CStr(NombreFinal) + EXT_archivo)
 
         Next
 
-
+        MsgBox("Archivos Ordenados")
 
     End Sub
 
