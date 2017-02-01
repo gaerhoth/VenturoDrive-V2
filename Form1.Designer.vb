@@ -22,6 +22,8 @@ Partial Class VentuDrive
     'No lo modifique con el editor de código.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(VentuDrive))
         Me.Button1 = New System.Windows.Forms.Button()
         Me.lvArchivos = New System.Windows.Forms.ListView()
         Me.lvCuentas = New System.Windows.Forms.ListView()
@@ -49,6 +51,12 @@ Partial Class VentuDrive
         Me.Btn_organizar = New System.Windows.Forms.Button()
         Me.btndirfotos = New System.Windows.Forms.Button()
         Me.txtdirfotos = New System.Windows.Forms.TextBox()
+        Me.PB = New System.Windows.Forms.ProgressBar()
+        Me.lbl_PB = New System.Windows.Forms.Label()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.btn_uni = New System.Windows.Forms.Button()
+        Me.dir_uni = New System.Windows.Forms.TextBox()
+        Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -73,12 +81,15 @@ Partial Class VentuDrive
         '
         'lvCuentas
         '
+        Me.lvCuentas.FullRowSelect = True
         Me.lvCuentas.Location = New System.Drawing.Point(9, 103)
         Me.lvCuentas.Margin = New System.Windows.Forms.Padding(2)
         Me.lvCuentas.Name = "lvCuentas"
         Me.lvCuentas.Size = New System.Drawing.Size(149, 346)
+        Me.lvCuentas.SmallImageList = Me.ImageList1
         Me.lvCuentas.TabIndex = 2
         Me.lvCuentas.UseCompatibleStateImageBehavior = False
+        Me.lvCuentas.View = System.Windows.Forms.View.List
         '
         'MenuStrip1
         '
@@ -87,7 +98,7 @@ Partial Class VentuDrive
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Padding = New System.Windows.Forms.Padding(4, 2, 0, 2)
-        Me.MenuStrip1.Size = New System.Drawing.Size(741, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(751, 24)
         Me.MenuStrip1.TabIndex = 3
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -239,7 +250,7 @@ Partial Class VentuDrive
         '
         'Btn_organizar
         '
-        Me.Btn_organizar.Location = New System.Drawing.Point(12, 26)
+        Me.Btn_organizar.Location = New System.Drawing.Point(12, 53)
         Me.Btn_organizar.Margin = New System.Windows.Forms.Padding(2)
         Me.Btn_organizar.Name = "Btn_organizar"
         Me.Btn_organizar.Size = New System.Drawing.Size(118, 24)
@@ -249,7 +260,7 @@ Partial Class VentuDrive
         '
         'btndirfotos
         '
-        Me.btndirfotos.Location = New System.Drawing.Point(538, 26)
+        Me.btndirfotos.Location = New System.Drawing.Point(546, 54)
         Me.btndirfotos.Margin = New System.Windows.Forms.Padding(2)
         Me.btndirfotos.Name = "btndirfotos"
         Me.btndirfotos.Size = New System.Drawing.Size(26, 24)
@@ -260,17 +271,75 @@ Partial Class VentuDrive
         'txtdirfotos
         '
         Me.txtdirfotos.Enabled = False
-        Me.txtdirfotos.Location = New System.Drawing.Point(132, 28)
+        Me.txtdirfotos.Location = New System.Drawing.Point(140, 56)
         Me.txtdirfotos.Margin = New System.Windows.Forms.Padding(2)
         Me.txtdirfotos.Name = "txtdirfotos"
         Me.txtdirfotos.Size = New System.Drawing.Size(403, 20)
         Me.txtdirfotos.TabIndex = 11
         '
+        'PB
+        '
+        Me.PB.Location = New System.Drawing.Point(577, 54)
+        Me.PB.Name = "PB"
+        Me.PB.Size = New System.Drawing.Size(130, 23)
+        Me.PB.Style = System.Windows.Forms.ProgressBarStyle.Continuous
+        Me.PB.TabIndex = 13
+        '
+        'lbl_PB
+        '
+        Me.lbl_PB.AutoSize = True
+        Me.lbl_PB.Location = New System.Drawing.Point(712, 59)
+        Me.lbl_PB.Name = "lbl_PB"
+        Me.lbl_PB.Size = New System.Drawing.Size(24, 13)
+        Me.lbl_PB.TabIndex = 14
+        Me.lbl_PB.Text = "0 %"
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(9, 29)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(127, 13)
+        Me.Label3.TabIndex = 16
+        Me.Label3.Text = "Directorio de unificaccion"
+        '
+        'btn_uni
+        '
+        Me.btn_uni.Location = New System.Drawing.Point(546, 24)
+        Me.btn_uni.Margin = New System.Windows.Forms.Padding(2)
+        Me.btn_uni.Name = "btn_uni"
+        Me.btn_uni.Size = New System.Drawing.Size(26, 24)
+        Me.btn_uni.TabIndex = 18
+        Me.btn_uni.Text = "..."
+        Me.btn_uni.UseVisualStyleBackColor = True
+        '
+        'dir_uni
+        '
+        Me.dir_uni.Enabled = False
+        Me.dir_uni.Location = New System.Drawing.Point(140, 26)
+        Me.dir_uni.Margin = New System.Windows.Forms.Padding(2)
+        Me.dir_uni.Name = "dir_uni"
+        Me.dir_uni.Size = New System.Drawing.Size(403, 20)
+        Me.dir_uni.TabIndex = 17
+        '
+        'ImageList1
+        '
+        Me.ImageList1.ImageStream = CType(resources.GetObject("ImageList1.ImageStream"), System.Windows.Forms.ImageListStreamer)
+        Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
+        Me.ImageList1.Images.SetKeyName(0, "drive.jpg")
+        Me.ImageList1.Images.SetKeyName(1, "Dropbox.png")
+        Me.ImageList1.Images.SetKeyName(2, "one.jpg")
+        '
         'VentuDrive
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(741, 513)
+        Me.ClientSize = New System.Drawing.Size(751, 513)
+        Me.Controls.Add(Me.btn_uni)
+        Me.Controls.Add(Me.dir_uni)
+        Me.Controls.Add(Me.Label3)
+        Me.Controls.Add(Me.lbl_PB)
+        Me.Controls.Add(Me.PB)
         Me.Controls.Add(Me.btndirfotos)
         Me.Controls.Add(Me.txtdirfotos)
         Me.Controls.Add(Me.Btn_organizar)
@@ -322,4 +391,10 @@ Partial Class VentuDrive
     Friend WithEvents Btn_organizar As Button
     Friend WithEvents btndirfotos As Button
     Friend WithEvents txtdirfotos As TextBox
+    Friend WithEvents PB As ProgressBar
+    Friend WithEvents lbl_PB As Label
+    Friend WithEvents Label3 As Label
+    Friend WithEvents btn_uni As Button
+    Friend WithEvents dir_uni As TextBox
+    Friend WithEvents ImageList1 As ImageList
 End Class

@@ -183,6 +183,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>BBDD_GOOGLE.mdf</DependentUpon>
     </Content>
+    <Content Include="Img\one.jpg" />
+    <Content Include="Img\drive.jpg" />
+    <Content Include="Img\Dropbox.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.1">

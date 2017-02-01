@@ -13,9 +13,20 @@ Imports System.IO
 
 Public Class VentuDrive
     Public DIR_FOTOS As String
+    Public DIRE_UNI As String
     Dim begreen As Boolean = True
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        'tendriamos que hacer un select de la tabla de BBDD y rellenar el treeview
+
+        'lvCuentas.Items.Add("gaerhoth@gmail.com", 0) 'drive
+        'lvCuentas.Items.Add("gaerhoth@hotmail.com", 1) ' dropbox 
+        'lvCuentas.Items.Add("gaerhoth@hotmail.com", 2) ' ondrive
+
+
+        'https://console.developers.google.com/projectselector/apis/credentials
+
         CreateService()
     End Sub
 
@@ -167,63 +178,136 @@ Public Class VentuDrive
     End Sub
 
     Private Sub Btn_organizar_Click(sender As Object, e As EventArgs) Handles Btn_organizar.Click
-        If My.Computer.FileSystem.DirectoryExists(DIR_FOTOS + "\Fotos_Organizadas\") = False Then
-            My.Computer.FileSystem.CreateDirectory(DIR_FOTOS + "\Fotos_Organizadas\")
+
+        If (DIR_FOTOS <> "" And DIRE_UNI <> "") Then
+
+
+
+            If My.Computer.FileSystem.DirectoryExists(DIRE_UNI + "\Fotos_Organizadas\") = False Then
+                My.Computer.FileSystem.CreateDirectory(DIRE_UNI + "\Fotos_Organizadas\")
+            End If
+            If My.Computer.FileSystem.DirectoryExists(DIRE_UNI + "\TMP\") = False Then
+                My.Computer.FileSystem.CreateDirectory(DIRE_UNI + "\TMP\")
+            End If
+
+            Dim i As Integer
+            Dim Contador = My.Computer.FileSystem.GetFiles(DIR_FOTOS, FileIO.SearchOption.SearchAllSubDirectories)
+
+
+            For Each Archivo As String In My.Computer.FileSystem.GetFiles(DIR_FOTOS, FileIO.SearchOption.SearchAllSubDirectories,
+                                    "*.*")
+
+                Dim fileCreatedDate As DateTime = System.IO.File.GetLastWriteTime(Archivo)
+
+                Dim Nom_archivo As String
+                Dim EXT_archivo As String
+                Nom_archivo = Path.GetFileName(Archivo)
+                EXT_archivo = Path.GetExtension(Archivo)
+
+
+
+                Dim anyo As String
+                Dim mes As String
+                anyo = fileCreatedDate.Year
+
+                mes = fileCreatedDate.Month
+                If mes < 10 Then
+                    mes = "0" & mes
+                End If
+
+                If (EXT_archivo <> ".avi" And EXT_archivo <> ".mp4") Then
+
+
+                    If My.Computer.FileSystem.DirectoryExists(DIRE_UNI + "\Fotos_Organizadas\" + anyo) = False Then
+                        My.Computer.FileSystem.CreateDirectory(DIRE_UNI + "\Fotos_Organizadas\" + anyo)
+                        If My.Computer.FileSystem.DirectoryExists(DIRE_UNI + "\Fotos_Organizadas\" + anyo + "\" + mes) = False Then
+                            My.Computer.FileSystem.CreateDirectory(DIRE_UNI + "\Fotos_Organizadas\" + anyo + "\" + mes)
+                        End If
+                    Else
+                        If My.Computer.FileSystem.DirectoryExists(DIRE_UNI + "\Fotos_Organizadas\" + anyo + "\" + mes) = False Then
+                            My.Computer.FileSystem.CreateDirectory(DIRE_UNI + "\Fotos_Organizadas\" + anyo + "\" + mes)
+                        End If
+
+                    End If
+
+                    Dim dir_mover As String = DIRE_UNI + "\Fotos_Organizadas\" + anyo + "\" + mes
+                    Dim dir_temporal As String = DIRE_UNI + "\TMP"
+
+                    'Crea la carpeta para ir introducion las fotos que corresponde
+
+
+                    'cuento los arvhivos que hay en la carpeta
+                    Dim counter = My.Computer.FileSystem.GetFiles(dir_mover)
+
+                    Dim NombreFinal = counter.Count + 1
+                    'Muevo la foto al temporal
+                    My.Computer.FileSystem.MoveFile(Archivo, dir_temporal + "\" + Nom_archivo)
+
+                    'renombro la foto
+                    My.Computer.FileSystem.RenameFile(dir_temporal + "\" + Nom_archivo, CStr(NombreFinal) + EXT_archivo)
+
+                    'Muevo la foto al directorio final
+                    My.Computer.FileSystem.MoveFile(dir_temporal & "\" & CStr(NombreFinal) + EXT_archivo, dir_mover + "\" + CStr(NombreFinal) + EXT_archivo)
+
+                Else
+
+                    If My.Computer.FileSystem.DirectoryExists(DIRE_UNI + "\Fotos_Organizadas\Videos\" + anyo) = False Then
+                        My.Computer.FileSystem.CreateDirectory(DIRE_UNI + "\Fotos_Organizadas\Videos\" + anyo)
+                        If My.Computer.FileSystem.DirectoryExists(DIRE_UNI + "\Fotos_Organizadas\Videos\" + anyo + "\" + mes) = False Then
+                            My.Computer.FileSystem.CreateDirectory(DIRE_UNI + "\Fotos_Organizadas\Videos\" + anyo + "\" + mes)
+                        End If
+                    Else
+                        If My.Computer.FileSystem.DirectoryExists(DIRE_UNI + "\Fotos_Organizadas\Videos\" + anyo + "\" + mes) = False Then
+                            My.Computer.FileSystem.CreateDirectory(DIRE_UNI + "\Fotos_Organizadas\Videos\" + anyo + "\" + mes)
+                        End If
+
+                    End If
+
+                    Dim dir_mover As String = DIRE_UNI + "\Fotos_Organizadas\Videos\" + anyo + "\" + mes
+                    Dim dir_temporal As String = DIRE_UNI + "\TMP"
+
+                    'Crea la carpeta para ir introducion las fotos que corresponde
+
+
+                    'cuento los arvhivos que hay en la carpeta
+                    Dim counter = My.Computer.FileSystem.GetFiles(dir_mover)
+
+                    Dim NombreFinal = counter.Count + 1
+                    'Muevo la foto al temporal
+                    My.Computer.FileSystem.MoveFile(Archivo, dir_temporal + "\" + Nom_archivo)
+
+                    'renombro la foto
+                    My.Computer.FileSystem.RenameFile(dir_temporal + "\" + Nom_archivo, CStr(NombreFinal) + EXT_archivo)
+
+                    'Muevo la foto al directorio final
+                    My.Computer.FileSystem.MoveFile(dir_temporal & "\" & CStr(NombreFinal) + EXT_archivo, dir_mover + "\" + CStr(NombreFinal) + EXT_archivo)
+
+
+                End If
+                i = i + 1
+                PB.Increment(1)
+                PB.Value = CInt((i * 100) / Contador.Count)
+                Me.lbl_PB.Text = PB.Value
+            Next
+
+
+            My.Computer.FileSystem.DeleteDirectory(DIR_FOTOS, FileIO.DeleteDirectoryOption.DeleteAllContents)
+
+
+            Dim carpeta As New DirectoryInfo(DIR_FOTOS)
+            For Each D As DirectoryInfo In carpeta.GetDirectories
+                If D.Name <> "TMP" Then
+                    D.Delete(True)
+                End If
+            Next
+
+            MsgBox("Archivos Ordenados")
+
+                Else
+
+                    MsgBox("Seleccione una carpeta para ordenar.")
+
         End If
-
-
-        For Each Archivo As String In My.Computer.FileSystem.GetFiles(DIR_FOTOS, FileIO.SearchOption.SearchAllSubDirectories,
-                                "*.*")
-
-            Dim fileCreatedDate As DateTime = System.IO.File.GetLastWriteTime(Archivo)
-
-            Dim Nom_archivo As String
-            Dim EXT_archivo As String
-            Nom_archivo = Path.GetFileName(Archivo)
-            EXT_archivo = Path.GetExtension(Archivo)
-
-
-
-            Dim anyo As String
-            Dim mes As String
-            anyo = fileCreatedDate.Year
-
-            mes = fileCreatedDate.Month
-            If mes < 10 Then
-                mes = "0" & mes
-            End If
-
-            If My.Computer.FileSystem.DirectoryExists(DIR_FOTOS + "\Fotos_Organizadas\" + anyo) = False Then
-                My.Computer.FileSystem.CreateDirectory(DIR_FOTOS + "\Fotos_Organizadas\" + anyo)
-                If My.Computer.FileSystem.DirectoryExists(DIR_FOTOS + "\Fotos_Organizadas\" + anyo + "\" + mes) = False Then
-                    My.Computer.FileSystem.CreateDirectory(DIR_FOTOS + "\Fotos_Organizadas\" + anyo + "\" + mes)
-                End If
-            Else
-                If My.Computer.FileSystem.DirectoryExists(DIR_FOTOS + "\Fotos_Organizadas\" + anyo + "\" + mes) = False Then
-                    My.Computer.FileSystem.CreateDirectory(DIR_FOTOS + "\Fotos_Organizadas\" + anyo + "\" + mes)
-                End If
-
-            End If
-
-            Dim dir_mover As String = DIR_FOTOS + "\Fotos_Organizadas\" + anyo + "\" + mes
-
-
-            'Crea la carpeta para ir introducion las fotos que corresponde
-
-
-            'cuento los arvhivos que hay en la carpeta
-            Dim counter = My.Computer.FileSystem.GetFiles(dir_mover)
-
-            Dim NombreFinal = counter.Count + 1
-            'Muevo la foto
-            My.Computer.FileSystem.MoveFile(Archivo, dir_mover + "\" + Nom_archivo)
-
-            'renombro la foto
-            My.Computer.FileSystem.RenameFile(dir_mover + "\" + Nom_archivo, CStr(NombreFinal) + EXT_archivo)
-
-        Next
-
-        MsgBox("Archivos Ordenados")
 
     End Sub
 
@@ -232,6 +316,13 @@ Public Class VentuDrive
         oFD.ShowDialog()
         Me.txtdirfotos.Text = oFD.SelectedPath
         DIR_FOTOS = txtdirfotos.Text
+    End Sub
+
+    Private Sub btn_uni_Click(sender As Object, e As EventArgs) Handles btn_uni.Click
+        Dim oFD As New FolderBrowserDialog
+        oFD.ShowDialog()
+        Me.dir_uni.Text = oFD.SelectedPath
+        DIRE_UNI = dir_uni.Text
     End Sub
 End Class
 #Region "Comentado"
