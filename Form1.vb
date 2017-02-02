@@ -319,9 +319,9 @@ Public Class VentuDrive
 
             MsgBox("Archivos Ordenados")
 
-                Else
+        Else
 
-                    MsgBox("Seleccione una carpeta para ordenar.")
+            MsgBox("Seleccione una carpeta para ordenar.")
 
         End If
 

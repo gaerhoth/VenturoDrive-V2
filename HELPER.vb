@@ -6,15 +6,15 @@ Imports Google.Apis.Drive.v2
 'Namespace Drive.api
 Public Class HELPER
 
-        ''' <summary>
-        ''' Download a file
-        ''' Documentation: https://developers.google.com/drive/v2/reference/files/get
-        ''' </summary>
-        ''' <param name="_service">a Valid authenticated DriveService</param>
-        ''' <param name="_fileResource">File resource of the file to download</param>
-        ''' <param name="_saveTo">location of where to save the file including the file name to save it as.</param>
-        ''' <returns></returns>
-        Public Shared Function downloadFile(_service As DriveService, _fileResource As File, _saveTo As String) As [Boolean]
+    ''' <summary>
+    ''' Download a file
+    ''' Documentation: https://developers.google.com/drive/v2/reference/files/get
+    ''' </summary>
+    ''' <param name="_service">a Valid authenticated DriveService</param>
+    ''' <param name="_fileResource">File resource of the file to download</param>
+    ''' <param name="_saveTo">location of where to save the file including the file name to save it as.</param>
+    ''' <returns></returns>
+    Public Shared Function downloadFile(_service As DriveService, _fileResource As File, _saveTo As String) As [Boolean]
 
             If Not [String].IsNullOrEmpty(_fileResource.DownloadUrl) Then
                 Try
