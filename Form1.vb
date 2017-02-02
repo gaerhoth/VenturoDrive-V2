@@ -10,14 +10,30 @@ Imports Google.Apis.Services
 Imports Google.Apis.Auth
 Imports Google.Apis.Download
 Imports System.IO
+Imports System.Data
+Imports System.Data.SqlClient
 
 Public Class VentuDrive
     Public DIR_FOTOS As String
     Public DIRE_UNI As String
     Dim begreen As Boolean = True
+    Dim sConnectionString As String = "Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\BBDD_GOOGLE.mdf;Integrated Security=True"
+
+
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
+        Dim objConn As New SqlConnection(sConnectionString)
+        objConn.Open()
+
+        '      Dim sSQL As String = "INSERT INTO TCLIENTE  " & _  "(emp_id, fname, minit, lname, job_id, job_lvl, pub_id, hire_date)" & _
+        '"VALUES ('MSD12923F', 'Duncan', 'W', 'Mackenzie', " & _ 
+        '         "10, 82,'0877','2001-01-01')"
+
+        Dim sSQL As String = "INSERT INTO TCUENTAS values('DAvid1','1','1','O','N') "
+        Dim objCmd As New SqlCommand(sSQL, objConn)
+
+        objCmd.ExecuteNonQuery()
         'tendriamos que hacer un select de la tabla de BBDD y rellenar el treeview
 
         'lvCuentas.Items.Add("gaerhoth@gmail.com", 0) 'drive
