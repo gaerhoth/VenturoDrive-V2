@@ -177,10 +177,11 @@ Public Class HELPER
             Dim Files As IList(Of File) = New List(Of File)()
 
             Try
-                'List all of the files and directories for the current user.  
-                ' Documentation: https://developers.google.com/drive/v2/reference/files/list
-                Dim list As FilesResource.ListRequest = service.Files.List()
-                list.MaxResults = 1000
+            'List all of the files and directories for the current user.  
+            ' Documentation: https://developers.google.com/drive/v2/reference/files/list
+
+            Dim list As FilesResource.ListRequest = service.Files.List()
+            list.MaxResults = 1000
                 If search IsNot Nothing Then
                     list.Q = search
                 End If

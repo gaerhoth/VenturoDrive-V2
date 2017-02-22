@@ -27,6 +27,7 @@ Partial Class VentuDrive
         Me.Button1 = New System.Windows.Forms.Button()
         Me.lvArchivos = New System.Windows.Forms.ListView()
         Me.lvCuentas = New System.Windows.Forms.ListView()
+        Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.ArchivoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CuentasToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -56,7 +57,8 @@ Partial Class VentuDrive
         Me.Label3 = New System.Windows.Forms.Label()
         Me.btn_uni = New System.Windows.Forms.Button()
         Me.dir_uni = New System.Windows.Forms.TextBox()
-        Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
+        Me.Button3 = New System.Windows.Forms.Button()
+        Me.ObtenerCredencialesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -91,6 +93,14 @@ Partial Class VentuDrive
         Me.lvCuentas.UseCompatibleStateImageBehavior = False
         Me.lvCuentas.View = System.Windows.Forms.View.List
         '
+        'ImageList1
+        '
+        Me.ImageList1.ImageStream = CType(resources.GetObject("ImageList1.ImageStream"), System.Windows.Forms.ImageListStreamer)
+        Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
+        Me.ImageList1.Images.SetKeyName(0, "drive.jpg")
+        Me.ImageList1.Images.SetKeyName(1, "Dropbox.png")
+        Me.ImageList1.Images.SetKeyName(2, "one.jpg")
+        '
         'MenuStrip1
         '
         Me.MenuStrip1.ImageScalingSize = New System.Drawing.Size(20, 20)
@@ -113,33 +123,33 @@ Partial Class VentuDrive
         '
         Me.CuentasToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.GoogleDriveToolStripMenuItem, Me.OneDriveToolStripMenuItem, Me.DropBoxToolStripMenuItem})
         Me.CuentasToolStripMenuItem.Name = "CuentasToolStripMenuItem"
-        Me.CuentasToolStripMenuItem.Size = New System.Drawing.Size(117, 22)
+        Me.CuentasToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.CuentasToolStripMenuItem.Text = "Cuentas"
         '
         'GoogleDriveToolStripMenuItem
         '
-        Me.GoogleDriveToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NuevaToolStripMenuItem, Me.ExistenteToolStripMenuItem})
+        Me.GoogleDriveToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NuevaToolStripMenuItem, Me.ExistenteToolStripMenuItem, Me.ObtenerCredencialesToolStripMenuItem})
         Me.GoogleDriveToolStripMenuItem.Name = "GoogleDriveToolStripMenuItem"
-        Me.GoogleDriveToolStripMenuItem.Size = New System.Drawing.Size(142, 22)
+        Me.GoogleDriveToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.GoogleDriveToolStripMenuItem.Text = "Google Drive"
         '
         'NuevaToolStripMenuItem
         '
         Me.NuevaToolStripMenuItem.Name = "NuevaToolStripMenuItem"
-        Me.NuevaToolStripMenuItem.Size = New System.Drawing.Size(120, 22)
+        Me.NuevaToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.NuevaToolStripMenuItem.Text = "Nueva"
         '
         'ExistenteToolStripMenuItem
         '
         Me.ExistenteToolStripMenuItem.Name = "ExistenteToolStripMenuItem"
-        Me.ExistenteToolStripMenuItem.Size = New System.Drawing.Size(120, 22)
+        Me.ExistenteToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
         Me.ExistenteToolStripMenuItem.Text = "Existente"
         '
         'OneDriveToolStripMenuItem
         '
         Me.OneDriveToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NuevaToolStripMenuItem1, Me.ExistenteToolStripMenuItem1})
         Me.OneDriveToolStripMenuItem.Name = "OneDriveToolStripMenuItem"
-        Me.OneDriveToolStripMenuItem.Size = New System.Drawing.Size(142, 22)
+        Me.OneDriveToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.OneDriveToolStripMenuItem.Text = "One Drive"
         '
         'NuevaToolStripMenuItem1
@@ -158,7 +168,7 @@ Partial Class VentuDrive
         '
         Me.DropBoxToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NuevaToolStripMenuItem2, Me.ExistenteToolStripMenuItem2})
         Me.DropBoxToolStripMenuItem.Name = "DropBoxToolStripMenuItem"
-        Me.DropBoxToolStripMenuItem.Size = New System.Drawing.Size(142, 22)
+        Me.DropBoxToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.DropBoxToolStripMenuItem.Text = "DropBox"
         '
         'NuevaToolStripMenuItem2
@@ -177,7 +187,7 @@ Partial Class VentuDrive
         '
         Me.TransferenciaToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SeleccionarCuentasToolStripMenuItem})
         Me.TransferenciaToolStripMenuItem.Name = "TransferenciaToolStripMenuItem"
-        Me.TransferenciaToolStripMenuItem.Size = New System.Drawing.Size(90, 20)
+        Me.TransferenciaToolStripMenuItem.Size = New System.Drawing.Size(89, 20)
         Me.TransferenciaToolStripMenuItem.Text = "Transferencia"
         '
         'SeleccionarCuentasToolStripMenuItem
@@ -322,19 +332,28 @@ Partial Class VentuDrive
         Me.dir_uni.Size = New System.Drawing.Size(403, 20)
         Me.dir_uni.TabIndex = 17
         '
-        'ImageList1
+        'Button3
         '
-        Me.ImageList1.ImageStream = CType(resources.GetObject("ImageList1.ImageStream"), System.Windows.Forms.ImageListStreamer)
-        Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
-        Me.ImageList1.Images.SetKeyName(0, "drive.jpg")
-        Me.ImageList1.Images.SetKeyName(1, "Dropbox.png")
-        Me.ImageList1.Images.SetKeyName(2, "one.jpg")
+        Me.Button3.Location = New System.Drawing.Point(9, 455)
+        Me.Button3.Margin = New System.Windows.Forms.Padding(2)
+        Me.Button3.Name = "Button3"
+        Me.Button3.Size = New System.Drawing.Size(118, 24)
+        Me.Button3.TabIndex = 19
+        Me.Button3.Text = "Directorio para subir"
+        Me.Button3.UseVisualStyleBackColor = True
+        '
+        'ObtenerCredencialesToolStripMenuItem
+        '
+        Me.ObtenerCredencialesToolStripMenuItem.Name = "ObtenerCredencialesToolStripMenuItem"
+        Me.ObtenerCredencialesToolStripMenuItem.Size = New System.Drawing.Size(187, 22)
+        Me.ObtenerCredencialesToolStripMenuItem.Text = "Obtener Credenciales"
         '
         'VentuDrive
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(751, 513)
+        Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.btn_uni)
         Me.Controls.Add(Me.dir_uni)
         Me.Controls.Add(Me.Label3)
@@ -397,4 +416,6 @@ Partial Class VentuDrive
     Friend WithEvents btn_uni As Button
     Friend WithEvents dir_uni As TextBox
     Friend WithEvents ImageList1 As ImageList
+    Friend WithEvents Button3 As Button
+    Friend WithEvents ObtenerCredencialesToolStripMenuItem As ToolStripMenuItem
 End Class

@@ -6,49 +6,18 @@ Imports Google.Apis.Auth.OAuth2
 Imports Google.Apis.Drive.v2
 Imports Google.Apis.Drive.v2.Data
 Imports Google.Apis.Services
-
 Imports Google.Apis.Auth
 Imports Google.Apis.Download
 Imports System.IO
 Imports System.Data
 Imports System.Data.SqlClient
+Imports VenturoDrive_V2.VAR_GLOBALES
+Imports VenturoDrive_V2.BBDD
 
 Public Class VentuDrive
-
-    Public Shared conn As SQLiteConnection
     Public DIR_FOTOS As String
     Public DIRE_UNI As String
     Dim begreen As Boolean = True
-    ' Dim sConnectionString As String = "Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\BBDD_GOOGLE.mdf;Integrated Security=True"
-    ' Dim Conn As String = "Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\BBDD_GOOGLE.mdf;Integrated Security=True"
-    Public Sub CREARBBDD()
-        '  Dim Ruta As String
-
-        'Dim a As SQLiteCommand
-        '        Dim b As SQLiteConnection
-
-        'Esto me crea la BBDD
-        SQLiteConnection.CreateFile("C:\a\BBDD_VentuDrive.db3")
-
-        conn = New SQLiteConnection("DataSource=c:\a\BBDD_VentuDrive.db3;Version=3;New=False;Compress=True;")
-
-        conn.Open()
-
-        Dim Query As New SQLiteCommand()
-        Query.Connection = conn
-        Query.CommandText = "CREATE TABLE MyTable(CustomerID INTEGER PRIMARY KEY ASC, FirstName VARCHAR(25))"
-        Query.ExecuteNonQuery()
-        conn.Close()
-
-
-        '   Ruta = Conexion()
-        '  conn = New SQLiteConnection(, New SQLite.Net.Platform.WinRT.SQLitePlatformWinRT, Ruta)
-        '  conn.Execute("PRAGMA encoding='utf-8'")
-
-        'Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
-        ' Encoding.GetEncoding("UTF-8")
-    End Sub
-
 
     Public Function Conexion() As String
         Return Path.Combine("C:\", "VentuDrive.sqlite")
@@ -58,21 +27,18 @@ Public Class VentuDrive
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
 
-        CREARBBDD()
+        BBDD.CREARBBDD()
 
-        '  Dim objConn As New SqlConnection(sConnectionString)
-        ' objConn.Open()
 
-        '      Dim sSQL As String = "INSERT INTO TCLIENTE  " & _  "(emp_id, fname, minit, lname, job_id, job_lvl, pub_id, hire_date)" & _
-        '"VALUES ('MSD12923F', 'Duncan', 'W', 'Mackenzie', " & _ 
-        '         "10, 82,'0877','2001-01-01')"
+        DameCuentasActivas()
 
-        ' Dim sSQL As String = "INSERT INTO TCUENTAS values('DAvid1','1','1','O','N') "
-        ' Dim objCmd As New SqlCommand(sSQL, objConn)
-
-        'objCmd.ExecuteNonQuery()
-
+        'Lo que tenemos que hacer aqui es seleccionar todas la cuentas que no esten de baja y meterlas en lvcuentas
         'tendriamos que hacer un select de la tabla de BBDD y rellenar el treeview
+        'tenemos que mirar si podemos hacer una ruta de internet como si fuera física.
+
+        'Cuando pinchemos en una cuenta conectar
+        'Hay que hacer una select para sacar el client secret y el client ID
+
 
         'lvCuentas.Items.Add("gaerhoth@gmail.com", 0) 'drive
         'lvCuentas.Items.Add("gaerhoth@hotmail.com", 1) ' dropbox 
@@ -81,20 +47,63 @@ Public Class VentuDrive
 
         'https://console.developers.google.com/projectselector/apis/credentials
 
-        CreateService()
+
+        'Me crea el servicio para conectarme a Google Drive
+        'CreateService()
     End Sub
 
     Private Service As DriveService = New DriveService
 
-    Private Sub CreateService()
+    'Private Sub CreateService()
 
-        Dim ClientId = "517228978970-0ohd9912k4v2v5ul6colclscgkfjvmeb.apps.googleusercontent.com"
-        Dim ClientSecret = "xw_ZQEWOXZVzR5D-E1kNvi-m"
+    '    Dim ClientId = "517228978970-0ohd9912k4v2v5ul6colclscgkfjvmeb.apps.googleusercontent.com"
+    '    Dim ClientSecret = "xw_ZQEWOXZVzR5D-E1kNvi-m"
+    '    Dim MyUserCredential As UserCredential = GoogleWebAuthorizationBroker.AuthorizeAsync(New ClientSecrets() With {.ClientId = ClientId, .ClientSecret = ClientSecret}, {DriveService.Scope.Drive}, "user", CancellationToken.None).Result
+    '    Service = New DriveService(New BaseClientService.Initializer() With {.HttpClientInitializer = MyUserCredential, .ApplicationName = "Google Drive VB Dot Net"})
+
+    'End Sub
+
+    Private Sub CreateService(ID As String, secret As String)
+
+        Dim ClientId = ID
+        Dim ClientSecret = secret
         Dim MyUserCredential As UserCredential = GoogleWebAuthorizationBroker.AuthorizeAsync(New ClientSecrets() With {.ClientId = ClientId, .ClientSecret = ClientSecret}, {DriveService.Scope.Drive}, "user", CancellationToken.None).Result
         Service = New DriveService(New BaseClientService.Initializer() With {.HttpClientInitializer = MyUserCredential, .ApplicationName = "Google Drive VB Dot Net"})
 
     End Sub
 
+    Public Sub DamecuentasActivas()
+        ' Using con As New SQLiteConnection(cs)
+        conn.Open()
+
+        Using cmd As New SQLiteCommand(conn)
+            Dim TTCuenta As Integer
+
+            cmd.CommandText = "SELECT * FROM TCUENTAS WHERE FEC_BAJA=''"
+
+            Dim rdr As SQLiteDataReader = cmd.ExecuteReader()
+
+            Using rdr
+                While (rdr.Read())
+
+                    Select Case rdr(2)
+                        Case "G"
+                            TTCuenta = 0
+                        Case "O"
+                            TTCuenta = 2
+                        Case "D"
+                            TTCuenta = 1
+                    End Select
+
+
+                    lvCuentas.Items.Add(rdr(1), TTCuenta)
+                End While
+            End Using
+            '    End Using
+
+            conn.Close()
+        End Using
+    End Sub
 
     Private Sub CrearDirectorio()
 
@@ -118,13 +127,26 @@ Public Class VentuDrive
 
     Private Sub UploadFile2(FilePath As String)
 
+        'para sacar el directoryID
+        'con esto decimos de que directorio quiero sacar el directory id
+        'Dim Q As String = "title = 'VENTURO2Sample' and mimeType = 'application/vnd.google-apps.folder'"
+        'Con esto sacamos el DirectoryID
+        'Dim _FILES As List(Of Google.Apis.Drive.v2.Data.File)
+        '_FILES = HELPER.GetFiles(Service, Q)
+        ' Dim directoryId As String
+        ' directoryId = _FILES(0).Id
 
 
-        Dim Q As String = "title = 'VENTURO2Sample' and mimeType = 'application/vnd.google-apps.folder'"
+
+        Dim Q As String = "title = 'DDos' and mimeType = 'application/vnd.google-apps.folder'"
 
         Dim _FILES As List(Of Google.Apis.Drive.v2.Data.File)
         'LISTAR
         _FILES = HELPER.GetFiles(Service, Q)
+
+
+
+        '_FILES(0).
 
         If (_FILES.Count = 0) Then
             ' Con esto creamos un directorio
@@ -134,6 +156,11 @@ Public Class VentuDrive
         Dim directoryId As String
         directoryId = _FILES(0).Id
 
+
+        'con esta creamos una carpeta dentro de otra
+        HELPER.createDirectory(Service, "VENTURO2Sample2", "VENTURO2Sample2", directoryId)
+
+        'subimos un archivo al directoryID
         Dim NEWFILE As Google.Apis.Drive.v2.Data.File
         NEWFILE = HELPER.uploadFile(Service, "c:\a.pdf", directoryId)
 
@@ -143,7 +170,7 @@ Public Class VentuDrive
 
     Private Sub DownloadFile(url As String, DownloadDir As String)
         Me.Cursor = Cursors.WaitCursor
-        If Service.ApplicationName <> "Google Drive VB Dot Net" Then CreateService()
+        If Service.ApplicationName <> "Google Drive VB Dot Net" Then CreateService(CID, CSC)
 
         Dim Downloader = New MediaDownloader(Service)
         Downloader.ChunkSize = 256 * 1024 '256 KB
@@ -212,15 +239,48 @@ Public Class VentuDrive
     End Sub
 
     Private Sub ExistenteToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExistenteToolStripMenuItem.Click
-
+        Dim frm As New CG()
+        frm.Show()
     End Sub
 
-    Private Sub lvCuentas_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lvCuentas.SelectedIndexChanged
+    Public Sub DameDatosCuenta(posicion As Integer)
+
+        conn.Open()
+
+        Using cmd As New SQLiteCommand(conn)
+            Dim TTCuenta As Integer
+
+            cmd.CommandText = "SELECT * FROM TCUENTAS WHERE ID_CUENTA = " & posicion & ""
+
+            Dim rdr As SQLiteDataReader = cmd.ExecuteReader()
+
+            Using rdr
+                While (rdr.Read())
+
+                    ' lvCuentas.Items.Add(rdr(1), TTCuenta)
+                    CID = rdr(3)
+                    CSC = rdr(4)
+
+                End While
+            End Using
+            '    End Using
+
+            conn.Close()
+        End Using
 
     End Sub
 
     Private Sub lvCuentas_MouseDoubleClick(sender As Object, e As MouseEventArgs) Handles lvCuentas.MouseDoubleClick
         'conectar a la cuenta
+
+        CID = ""
+        CSC = ""
+        Dim p = lvCuentas.FocusedItem.Index
+        DameDatosCuenta(p + 1)
+
+        CreateService(CID, CSC)
+
+
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
@@ -378,6 +438,70 @@ Public Class VentuDrive
         Me.dir_uni.Text = oFD.SelectedPath
         DIRE_UNI = dir_uni.Text
     End Sub
+
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+        UploadFile2("")
+
+        'listar
+        HELPER.GetFiles(Service, Nothing)
+
+    End Sub
+
+    Private Sub ObtenerCredencialesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ObtenerCredencialesToolStripMenuItem.Click
+        Process.Start("https://console.developers.google.com/projectselector/apis/credentials")
+    End Sub
+
+
+
+    'desde aqui son pruebas
+
+
+    'listar ROOT
+    'Public Function GetFiles(Optional parentId As String = "root", Optional search As String = Nothing, Optional pageToken As String = Nothing, Optional perpage As System.Nullable(Of Integer) = Nothing, Optional order As SortOrder = SortOrder.LastModifiedDesc) As GDriveFilesResponse
+    '    Dim gfiles = New List(Of GDriveFile)()
+    '    Dim request = Service.Files.List()
+
+    '    'request.Q = "mimeType='text/plain'";
+    '    request.Q = "trashed=false"
+    '    ' undeleted items
+    '    request.Q += String.Format(" and '{0}' in parents", parentId)
+    '    ' https://developers.google.com/drive/search-parameters
+    '    request.Q += If(Not String.IsNullOrEmpty(search), String.Format(" and title contains '{0}'", search), String.Empty)
+    '    'request.Q = "mimeType='application/vnd.google-apps.folder' and trashed=false";
+    '    request.PageToken = pageToken
+    '    request.MaxResults = perpage
+
+    '    'request.RequestParameters.Add("orderBy", new Parameter() { }); // TODO: for sorting
+
+    '    Dim files = request.Execute()
+
+    '    For Each file As var In files.Items
+    '        gfiles.Add(New GDriveFile(file))
+    '    Next
+
+    '    Return New GDriveFilesResponse(gfiles, files.NextPageToken)
+    'End Function
+
+
+
+
+    'Public Sub GDriveFile(file As Google.Apis.Drive.v2.Data.File, Optional isTrash As Boolean = False)
+    '    Id = file.Id
+    '    FileName = file.OriginalFilename
+    '    Dim size__1 As Long = -1
+    '    Size = If(file.FileSize IsNot Nothing AndAlso Long.TryParse(file.FileSize, size__1), size__1, -1)
+    '    Title = file.Title
+    '    Description = file.Description
+    '    CreatedDate = file.CreatedDate
+    '    ModifiedDate = If(file.ModifiedDate, file.CreatedDate)
+    '    DownloadUrl = file.DownloadUrl
+    '    ThumbnailUrl = file.ThumbnailLink
+
+    '    FileType = If(file.MimeType.Equals(FileMimeTypes.FolderMimeType), "folder", If(file.FileExtension, file.MimeType))
+    '    IsTrashed = isTrash
+    'End Sub
+
+
 End Class
 #Region "Comentado"
 
