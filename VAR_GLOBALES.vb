@@ -5,5 +5,9 @@ Public Class VAR_GLOBALES
     'id
     Public Shared CID As String
     'secret
-    Public Shared CSC As string
+    Public Shared CSC As String
+
+    Public Shared MBUSADOS As Decimal
+    Public Shared MBTOAL As Decimal
+    Public Shared MBLIBRES As Decimal
 End Class

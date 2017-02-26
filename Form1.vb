@@ -13,6 +13,8 @@ Imports System.Data
 Imports System.Data.SqlClient
 Imports VenturoDrive_V2.VAR_GLOBALES
 Imports VenturoDrive_V2.BBDD
+Imports  System.Configuration
+
 
 Public Class VentuDrive
     Public DIR_FOTOS As String
@@ -25,12 +27,12 @@ Public Class VentuDrive
 
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
+        lvCuentas.ContextMenuStrip = CR
 
         BBDD.CREARBBDD()
 
 
-        DameCuentasActivas()
+        DamecuentasActivas()
 
         'Lo que tenemos que hacer aqui es seleccionar todas la cuentas que no esten de baja y meterlas en lvcuentas
         'tendriamos que hacer un select de la tabla de BBDD y rellenar el treeview
@@ -54,7 +56,7 @@ Public Class VentuDrive
 
     Private Service As DriveService = New DriveService
 
-    'Private Sub CreateService()
+    'Private Sub CreateService()    
 
     '    Dim ClientId = "517228978970-0ohd9912k4v2v5ul6colclscgkfjvmeb.apps.googleusercontent.com"
     '    Dim ClientSecret = "xw_ZQEWOXZVzR5D-E1kNvi-m"
@@ -67,10 +69,26 @@ Public Class VentuDrive
 
         Dim ClientId = ID
         Dim ClientSecret = secret
-        Dim MyUserCredential As UserCredential = GoogleWebAuthorizationBroker.AuthorizeAsync(New ClientSecrets() With {.ClientId = ClientId, .ClientSecret = ClientSecret}, {DriveService.Scope.Drive}, "user", CancellationToken.None).Result
+        Dim MyUserCredential As UserCredential = GoogleWebAuthorizationBroker.AuthorizeAsync(New ClientSecrets() With {.ClientId = ClientId, .ClientSecret = ClientSecret}, {DriveService.Scope.Drive}, "gaerhoth", CancellationToken.None).Result
         Service = New DriveService(New BaseClientService.Initializer() With {.HttpClientInitializer = MyUserCredential, .ApplicationName = "Google Drive VB Dot Net"})
 
+
+
+
+        GetInfo()
+
+
+        Dim pr As Integer
+
+        pr = (MBUSADOS * 100) / MBTOAL
+
+        PBLIBRE.Value = pr
+
     End Sub
+
+    Public Function GetInfo() As GDriveAbout
+        Return New GDriveAbout(Service.About.[Get]().Execute())
+    End Function
 
     Public Sub DamecuentasActivas()
         ' Using con As New SQLiteConnection(cs)
@@ -451,6 +469,68 @@ Public Class VentuDrive
         Process.Start("https://console.developers.google.com/projectselector/apis/credentials")
     End Sub
 
+    Private Sub NuevaToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles NuevaToolStripMenuItem.Click
+        Process.Start("https://accounts.google.com/SignUp?service=mail&continue=https%3A%2F%2Fmail.google.com%2Fmail%2F&ltmpl=default")
+    End Sub
+
+    Private Sub lvCuentas_MouseDown(sender As Object, e As MouseEventArgs) Handles lvCuentas.MouseDown
+
+    End Sub
+
+    Private Sub btnrefres_Click(sender As Object, e As EventArgs) Handles btnrefres.Click
+        DamecuentasActivas()
+    End Sub
+
+    Private Sub GoogleDriveToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles GoogleDriveToolStripMenuItem1.Click
+        Dim frm As New CG()
+        frm.Show()
+    End Sub
+
+    Private Sub EliminarToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles EliminarToolStripMenuItem1.Click
+        Try
+            conn.Open()
+
+            Dim Query As New SQLiteCommand()
+            Query.Connection = conn
+
+            Dim F As String
+            F = Now.Date.ToString
+
+            Query.CommandText = "UPDATE TCUENTAS SET FEC_BAJA = '" & F & "' WHERE ID_CUENTA = " & lvCuentas.FocusedItem.Index + 1
+
+            Query.ExecuteNonQuery()
+            conn.Close()
+
+            MsgBox("Se han guardado los datos correctamente")
+
+            Me.Close()
+
+        Catch ex As Exception
+
+            MsgBox("Problemas al guardar tus datos")
+        End Try
+    End Sub
+
+    Private Sub CopiaBBDDToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CopiaBBDDToolStripMenuItem.Click
+        Dim RT As String
+        Dim oFD As New FolderBrowserDialog
+        oFD.ShowDialog()
+        RT = oFD.SelectedPath
+
+
+        My.Computer.FileSystem.CopyFile(ConfigurationManager.AppSettings("RUTA") & "VentuDrive.db3", RT)
+    End Sub
+
+    Private Sub RestaurarBBDDToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RestaurarBBDDToolStripMenuItem.Click
+
+        Dim RT As String
+        Dim oFD As New FolderBrowserDialog
+        oFD.ShowDialog()
+        RT = oFD.SelectedPath
+
+        My.Computer.FileSystem.CopyFile(RT, ConfigurationManager.AppSettings("RUTA"), True)
+    End Sub
+
 
 
     'desde aqui son pruebas
@@ -559,3 +639,86 @@ End Class
 'End Class
 
 #End Region
+
+
+
+
+'Private Sub ListView1_MouseDown(Button As Integer,
+'                                Shift As Integer,
+'                                x As Single, y As Single)
+
+'    'variable para el item seleccionado
+'    Dim Item As ListItem
+
+'    ' verifica que se presionó el botón derecho
+'    If Button = vbRightButton Then
+
+'        ' HitTest devuelve la ferencia al item, a partir _
+'        de las coordenadas del mouse
+'        Set Item = ListView1.HitTest(x, y)
+
+'        ' chequea que haya un item seleccionado
+'        If Not Item Is Nothing Then
+
+'            ' Selecciona el elemento
+'            Set ListView1.SelectedItem = Item
+
+'            ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'            ' Acá colocar el código para desplegar el menú popup.
+'            ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+'            ' texto del elemento seleccionado
+'            Me.Caption = Item.Text
+'            ' despliega el menú
+'            PopupMenu MiMenuPopUp
+
+'        End If
+
+
+'    End If
+
+'End Sub
+
+
+'Private Sub Form_Load()
+'    Dim i As Integer
+'    Dim Item As ListItem
+'    ' agrega un encabezado de columna
+'    ListView1.ColumnHeaders.Add , , "Columna 1"
+
+'    ' vista de reporte
+'    ListView1.View = lvwReport
+
+'    ' Agrega algunos elementos
+'    For i = 0 To 100
+'        ListView1.ListItems.Add , , "Elemento: " & i
+'    Next
+
+'End Sub
+
+Public Class GDriveAbout
+    Public username As String
+    Public BytesTotal As Long
+    Public BytesUsed As Long
+    Public RootFolderId As String
+    Public IsAuthenticated As Boolean
+    Public UserDisplayName As String
+    Public PictureUrl As String
+
+    Friend Sub New(about As About)
+        username = about.Name
+        BytesTotal = If(about.QuotaBytesTotal IsNot Nothing, Long.Parse(about.QuotaBytesTotal), -1)
+        BytesUsed = If(about.QuotaBytesUsed IsNot Nothing, Long.Parse(about.QuotaBytesUsed), -1)
+        RootFolderId = about.RootFolderId
+
+        If about.User IsNot Nothing Then
+            IsAuthenticated = about.User.IsAuthenticatedUser.HasValue AndAlso about.User.IsAuthenticatedUser.Value
+            UserDisplayName = about.User.DisplayName
+            PictureUrl = about.User.Picture.Url
+        End If
+
+        MBUSADOS = BytesUsed / 1048576
+        MBTOAL = BytesTotal / 1048576
+
+    End Sub
+End Class
