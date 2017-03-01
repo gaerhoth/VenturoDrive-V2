@@ -13,10 +13,16 @@ Imports System.Data
 Imports System.Data.SqlClient
 Imports VenturoDrive_V2.VAR_GLOBALES
 Imports VenturoDrive_V2.BBDD
-Imports  System.Configuration
-
+'Imports VenturoDrive_V2.GDrive.Explorer.ViewModels
+Imports VenturoDrive_V2.GDrive.Framework
+Imports System.Configuration
+Imports System.Runtime.InteropServices
 
 Public Class VentuDrive
+    <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
+    Private Shared Function SendMessage(ByVal hWnd As IntPtr, ByVal Msg As UInteger, ByVal wParam As Integer, ByVal lParam As Integer) As IntPtr
+    End Function
+
     Public DIR_FOTOS As String
     Public DIRE_UNI As String
     Dim begreen As Boolean = True
@@ -28,6 +34,8 @@ Public Class VentuDrive
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         lvCuentas.ContextMenuStrip = CR
+
+        '  lvArchivos.Items.Add("gaerhoth@gmail.com", 11)
 
         BBDD.CREARBBDD()
 
@@ -79,10 +87,20 @@ Public Class VentuDrive
 
 
         Dim pr As Integer
+        Dim GB_libres As Decimal
 
         pr = (MBUSADOS * 100) / MBTOAL
+        GB_libres = Math.Round(((MBTOAL - MBUSADOS) / 1024), 2)
+
 
         PBLIBRE.Value = pr
+        lbllibre.Text = GB_libres & " GB libres"
+        If pr > 95 Then
+            SendMessage(PBLIBRE.Handle, 1040, 2, 0)
+        End If
+
+        GetFiles()
+
 
     End Sub
 
@@ -517,185 +535,139 @@ Public Class VentuDrive
         oFD.ShowDialog()
         RT = oFD.SelectedPath
 
-
-        My.Computer.FileSystem.CopyFile(ConfigurationManager.AppSettings("RUTA") & "VentuDrive.db3", RT)
+        If RT <> "" Then
+            My.Computer.FileSystem.CopyFile(ConfigurationManager.AppSettings("RUTA") & "VentuDrive.db3", RT & "\VentuDrive.db3")
+            My.Computer.FileSystem.RenameFile(RT & "\VentuDrive.db3", "VentuDrive.Vdat")
+        Else
+            MsgBox("Debe seleccionar un directorio.", MsgBoxStyle.Information)
+        End If
     End Sub
 
     Private Sub RestaurarBBDDToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RestaurarBBDDToolStripMenuItem.Click
 
-        Dim RT As String
-        Dim oFD As New FolderBrowserDialog
-        oFD.ShowDialog()
-        RT = oFD.SelectedPath
+        Dim RT As String = ""
+        Dim oFD As New OpenFileDialog
+        With oFD
+            .Title = "Seccione un fichero"
+            .Filter = "Fichero VDrive(*.Vdat)|*.Vdat)"
 
-        My.Computer.FileSystem.CopyFile(RT, ConfigurationManager.AppSettings("RUTA"), True)
+            If .ShowDialog = System.Windows.Forms.DialogResult.OK Then
+
+                RT = .FileName
+            End If
+        End With
+
+
+        If RT <> "" Then
+            My.Computer.FileSystem.DeleteFile(ConfigurationManager.AppSettings("RUTA") & "\VentuDrive.db3")
+            My.Computer.FileSystem.CopyFile(RT, ConfigurationManager.AppSettings("RUTA") & "1.Vdat", True)
+            My.Computer.FileSystem.RenameFile(ConfigurationManager.AppSettings("RUTA") & "1.Vdat", "VentuDrive.db3")
+
+            'una vez restaurada comprobamos las cuentas activas que hay
+            DamecuentasActivas()
+        Else
+            MsgBox("Debe seleccionar un fichero.", MsgBoxStyle.Information)
+        End If
     End Sub
 
 
 
-    'desde aqui son pruebas
+    Public Function GetFiles(Optional parentId As String = "root", Optional search As String = Nothing,
+                             Optional pageToken As String = Nothing, Optional perpage As System.Nullable(Of Integer) = Nothing) As GDriveFilesResponse
+        Dim gfiles = New List(Of GDriveFile)()
+        Dim request = Service.Files.List()
+
+        'request.Q = "mimeType='text/plain'";
+        request.Q = "trashed=false"
+        ' undeleted items
+        request.Q += String.Format(" and '{0}' in parents", parentId)
+        ' https://developers.google.com/drive/search-parameters
+        request.Q += If(Not String.IsNullOrEmpty(search), String.Format(" and title contains '{0}'", search), String.Empty)
+        'request.Q = "mimeType='application/vnd.google-apps.folder' and trashed=false";
+        request.PageToken = pageToken
+        request.MaxResults = perpage
+
+        'request.RequestParameters.Add("orderBy", new Parameter() { }); // TODO: for sorting
+
+        Dim files = request.Execute()
+
+        For Each file In files.Items
+            gfiles.Add(New GDriveFile(file))
+            '  lvArchivos.Items.Add(New GDriveFile(file))
+            'lvArchivos.Items.Add(file.OriginalFilename)
+
+        Next
+
+        Dim i As Integer
+        For i = 0 To gfiles.Count - 1
+            Select Case gfiles.Item(i).FileType.ToUpper
+                Case "FOLDER"
+                    lvArchivos.Items.Add(gfiles.Item(i).Id, gfiles.Item(i).Title, 11)
+                Case "PDF"
+                    lvArchivos.Items.Add(gfiles.Item(i).DownloadUrl, gfiles.Item(i).Title, 12)
+                Case "TXT"
+                    lvArchivos.Items.Add(gfiles.Item(i).DownloadUrl, gfiles.Item(i).Title, 15)
+                Case "DOC"
+                    lvArchivos.Items.Add(gfiles.Item(i).DownloadUrl, gfiles.Item(i).Title, 9)
+                Case "JPG"
+                    lvArchivos.Items.Add(gfiles.Item(i).DownloadUrl, gfiles.Item(i).Title, 10)
+                Case "XLS"
+                    lvArchivos.Items.Add(gfiles.Item(i).DownloadUrl, gfiles.Item(i).Title, 16)
+                Case "DOCX"
+                    lvArchivos.Items.Add(gfiles.Item(i).DownloadUrl, gfiles.Item(i).Title, 10)
+                Case "XLSX"
+                    lvArchivos.Items.Add(gfiles.Item(i).DownloadUrl, gfiles.Item(i).Title, 17)
+                Case "PPT"
+                    lvArchivos.Items.Add(gfiles.Item(i).DownloadUrl, gfiles.Item(i).Title, 13)
+                Case "PPTX"
+                    lvArchivos.Items.Add(gfiles.Item(i).DownloadUrl, gfiles.Item(i).Title, 14)
+                Case Else
 
 
-    'listar ROOT
-    'Public Function GetFiles(Optional parentId As String = "root", Optional search As String = Nothing, Optional pageToken As String = Nothing, Optional perpage As System.Nullable(Of Integer) = Nothing, Optional order As SortOrder = SortOrder.LastModifiedDesc) As GDriveFilesResponse
-    '    Dim gfiles = New List(Of GDriveFile)()
-    '    Dim request = Service.Files.List()
+            End Select
 
-    '    'request.Q = "mimeType='text/plain'";
-    '    request.Q = "trashed=false"
-    '    ' undeleted items
-    '    request.Q += String.Format(" and '{0}' in parents", parentId)
-    '    ' https://developers.google.com/drive/search-parameters
-    '    request.Q += If(Not String.IsNullOrEmpty(search), String.Format(" and title contains '{0}'", search), String.Empty)
-    '    'request.Q = "mimeType='application/vnd.google-apps.folder' and trashed=false";
-    '    request.PageToken = pageToken
-    '    request.MaxResults = perpage
+        Next
 
-    '    'request.RequestParameters.Add("orderBy", new Parameter() { }); // TODO: for sorting
-
-    '    Dim files = request.Execute()
-
-    '    For Each file As var In files.Items
-    '        gfiles.Add(New GDriveFile(file))
-    '    Next
-
-    '    Return New GDriveFilesResponse(gfiles, files.NextPageToken)
-    'End Function
+        Return New GDriveFilesResponse(gfiles, files.NextPageToken)
+    End Function
 
 
 
+    Private Sub lvArchivos_MouseDoubleClick(sender As Object, e As MouseEventArgs) Handles lvArchivos.MouseDoubleClick
+        Dim fol As String
 
-    'Public Sub GDriveFile(file As Google.Apis.Drive.v2.Data.File, Optional isTrash As Boolean = False)
-    '    Id = file.Id
-    '    FileName = file.OriginalFilename
-    '    Dim size__1 As Long = -1
-    '    Size = If(file.FileSize IsNot Nothing AndAlso Long.TryParse(file.FileSize, size__1), size__1, -1)
-    '    Title = file.Title
-    '    Description = file.Description
-    '    CreatedDate = file.CreatedDate
-    '    ModifiedDate = If(file.ModifiedDate, file.CreatedDate)
-    '    DownloadUrl = file.DownloadUrl
-    '    ThumbnailUrl = file.ThumbnailLink
+        fol = lvArchivos.Items(lvArchivos.FocusedItem.Index).Name
 
-    '    FileType = If(file.MimeType.Equals(FileMimeTypes.FolderMimeType), "folder", If(file.FileExtension, file.MimeType))
-    '    IsTrashed = isTrash
-    'End Sub
+        If fol <> "" Then
+            'entrar en la otra carpeta
+            lvArchivos.Clear()
+            GetFiles(fol)
+        Else
+            DownloadFile(lvArchivos.Items(lvArchivos.FocusedItem.Index).Name, "C:\")
+            'sacar mensaje para descargar
+        End If
+
+    End Sub
+
+    Private Sub btnhome_Click(sender As Object, e As EventArgs) Handles btnhome.Click
+        Me.lvArchivos.Clear()
+        GetFiles()
+    End Sub
+
+    Private Sub btndelante_Click(sender As Object, e As EventArgs) Handles btndelante.Click
+        Me.lvArchivos.Clear()
+        'ir para adelante
+        GetFiles(btndelante.Tag)
+    End Sub
+
+    Private Sub btndetras_Click(sender As Object, e As EventArgs) Handles btndetras.Click
+        Me.lvArchivos.Clear()
+        'ir para atras
+        GetFiles(btndetras.Tag)
+    End Sub
 
 
 End Class
-#Region "Comentado"
-
-
-'Public Class ExploradorCarpetasVB
-
-
-'    Public Sub cargarSubcarpetas(ByVal rutaRaiz As String,
-'              ByVal nodoTree As Windows.Forms.TreeNode)
-'        On Error Resume Next
-'        Dim carpetaActual As String
-'        Dim indice As Integer
-
-'        If nodoTree.Nodes.Count = 0 Then
-'            For Each carpetaActual In
-'                    My.Computer.FileSystem.GetDirectories(rutaRaiz)
-'                indice = carpetaActual.LastIndexOf(System.IO.Path.PathSeparator)
-'                nodoTree.Nodes.Add(carpetaActual.Substring(indice + 1,
-'                     carpetaActual.Length - indice - 1))
-'                nodoTree.LastNode.Tag = carpetaActual
-'                nodoTree.LastNode.ImageIndex = 0
-'            Next
-'        End If
-'    End Sub
-
-'    Public Sub cargarCarpetas(ByVal rutaRaiz As String)
-'        Dim nodoBase As System.Windows.Forms.TreeNode
-
-'        If IO.Directory.Exists(rutaRaiz) Then
-'            If rutaRaiz.Length <= 3 Then
-'                nodoBase = TreeView1.Nodes.Add(rutaRaiz)
-'            Else
-'                nodoBase = TreeView1.Nodes.Add(
-'                    My.Computer.FileSystem.GetName(rutaRaiz))
-'            End If
-'            nodoBase.Tag = rutaRaiz
-'            cargarSubcarpetas(rutaRaiz, nodoBase)
-'        Else
-'            Throw New System.IO.DirectoryNotFoundException()
-'        End If
-'    End Sub
-
-'    Private Sub Button1_Click(sender As System.Object,
-'               e As System.EventArgs) Handles Button1.Click
-'        cargarCarpetas(TextBox1.Text)
-'    End Sub
-
-'    Private Sub TreeView1_AfterExpand(sender As System.Object,
-'               e As System.Windows.Forms.TreeViewEventArgs) Handles TreeView1.AfterExpand
-'        Dim n As System.Windows.Forms.TreeNode
-'        For Each n In e.Node.Nodes
-'            cargarSubcarpetas(n.Tag, n)
-'        Next
-'    End Sub
-'End Class
-
-#End Region
-
-
-
-
-'Private Sub ListView1_MouseDown(Button As Integer,
-'                                Shift As Integer,
-'                                x As Single, y As Single)
-
-'    'variable para el item seleccionado
-'    Dim Item As ListItem
-
-'    ' verifica que se presionó el botón derecho
-'    If Button = vbRightButton Then
-
-'        ' HitTest devuelve la ferencia al item, a partir _
-'        de las coordenadas del mouse
-'        Set Item = ListView1.HitTest(x, y)
-
-'        ' chequea que haya un item seleccionado
-'        If Not Item Is Nothing Then
-
-'            ' Selecciona el elemento
-'            Set ListView1.SelectedItem = Item
-
-'            ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'            ' Acá colocar el código para desplegar el menú popup.
-'            ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-'            ' texto del elemento seleccionado
-'            Me.Caption = Item.Text
-'            ' despliega el menú
-'            PopupMenu MiMenuPopUp
-
-'        End If
-
-
-'    End If
-
-'End Sub
-
-
-'Private Sub Form_Load()
-'    Dim i As Integer
-'    Dim Item As ListItem
-'    ' agrega un encabezado de columna
-'    ListView1.ColumnHeaders.Add , , "Columna 1"
-
-'    ' vista de reporte
-'    ListView1.View = lvwReport
-
-'    ' Agrega algunos elementos
-'    For i = 0 To 100
-'        ListView1.ListItems.Add , , "Elemento: " & i
-'    Next
-
-'End Sub
-
 Public Class GDriveAbout
     Public username As String
     Public BytesTotal As Long
@@ -708,7 +680,8 @@ Public Class GDriveAbout
     Friend Sub New(about As About)
         username = about.Name
         BytesTotal = If(about.QuotaBytesTotal IsNot Nothing, Long.Parse(about.QuotaBytesTotal), -1)
-        BytesUsed = If(about.QuotaBytesUsed IsNot Nothing, Long.Parse(about.QuotaBytesUsed), -1)
+        'BytesUsed = If(about.QuotaBytesUsed IsNot Nothing, Long.Parse(about.QuotaBytesUsed), -1)
+        BytesUsed = If(about.QuotaBytesUsedAggregate IsNot Nothing, Long.Parse(about.QuotaBytesUsedAggregate), -1)
         RootFolderId = about.RootFolderId
 
         If about.User IsNot Nothing Then
@@ -722,3 +695,7 @@ Public Class GDriveAbout
 
     End Sub
 End Class
+
+
+
+

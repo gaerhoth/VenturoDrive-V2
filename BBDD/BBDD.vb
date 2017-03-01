@@ -31,6 +31,9 @@ Public Class BBDD
                 'si no existe la creamos
                 SQLiteConnection.CreateFile(ConfigurationManager.AppSettings("RUTA") & "VentuDrive.db3")
 
+
+                conn = New SQLiteConnection("DataSource=" & ConfigurationManager.AppSettings("RUTA") & "VentuDrive.db3" & "VentuDrive.db3;Version=3;New=False;Compress=True;")
+                conn.Open()
                 'Creamos la tabla
                 Dim Query As New SQLiteCommand()
                 Query.Connection = conn
@@ -42,7 +45,7 @@ Public Class BBDD
         End If
 
         'Obtenemos la cadena de conexion de la BBDD
-        conn = New SQLiteConnection("DataSource=" & ConfigurationManager.AppSettings("RUTA") & "VentuDrive.db3" & "VentuDrive.db3;Version=3;New=False;Compress=True;")
+        conn = New SQLiteConnection("DataSource=" & ConfigurationManager.AppSettings("RUTA") & "VentuDrive.db3" & ";Version=3;New=False;Compress=True;")
     End Sub
 
 

@@ -26,6 +26,7 @@ Partial Class VentuDrive
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(VentuDrive))
         Me.Button1 = New System.Windows.Forms.Button()
         Me.lvArchivos = New System.Windows.Forms.ListView()
+        Me.ImageList2 = New System.Windows.Forms.ImageList(Me.components)
         Me.lvCuentas = New System.Windows.Forms.ListView()
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
@@ -70,13 +71,18 @@ Partial Class VentuDrive
         Me.EliminarToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.btnrefres = New System.Windows.Forms.Button()
         Me.PBLIBRE = New System.Windows.Forms.ProgressBar()
+        Me.btnhome = New System.Windows.Forms.Button()
+        Me.btndetras = New System.Windows.Forms.Button()
+        Me.btndelante = New System.Windows.Forms.Button()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.lbllibre = New System.Windows.Forms.Label()
         Me.MenuStrip1.SuspendLayout()
         Me.CR.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(243, 455)
+        Me.Button1.Location = New System.Drawing.Point(243, 510)
         Me.Button1.Margin = New System.Windows.Forms.Padding(2)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(118, 24)
@@ -86,12 +92,48 @@ Partial Class VentuDrive
         '
         'lvArchivos
         '
+        Me.lvArchivos.LargeImageList = Me.ImageList2
         Me.lvArchivos.Location = New System.Drawing.Point(243, 105)
         Me.lvArchivos.Margin = New System.Windows.Forms.Padding(2)
         Me.lvArchivos.Name = "lvArchivos"
         Me.lvArchivos.Size = New System.Drawing.Size(572, 346)
+        Me.lvArchivos.SmallImageList = Me.ImageList2
         Me.lvArchivos.TabIndex = 1
         Me.lvArchivos.UseCompatibleStateImageBehavior = False
+        '
+        'ImageList2
+        '
+        Me.ImageList2.ImageStream = CType(resources.GetObject("ImageList2.ImageStream"), System.Windows.Forms.ImageListStreamer)
+        Me.ImageList2.TransparentColor = System.Drawing.Color.Transparent
+        Me.ImageList2.Images.SetKeyName(0, "back.png")
+        Me.ImageList2.Images.SetKeyName(1, "busy.png")
+        Me.ImageList2.Images.SetKeyName(2, "clear.png")
+        Me.ImageList2.Images.SetKeyName(3, "clear-hover.png")
+        Me.ImageList2.Images.SetKeyName(4, "download.png")
+        Me.ImageList2.Images.SetKeyName(5, "edit.png")
+        Me.ImageList2.Images.SetKeyName(6, "forward.png")
+        Me.ImageList2.Images.SetKeyName(7, "home.png")
+        Me.ImageList2.Images.SetKeyName(8, "icon-default.png")
+        Me.ImageList2.Images.SetKeyName(9, "icon-doc.png")
+        Me.ImageList2.Images.SetKeyName(10, "icon-docx.png")
+        Me.ImageList2.Images.SetKeyName(11, "icon-folder.png")
+        Me.ImageList2.Images.SetKeyName(12, "icon-pdf.png")
+        Me.ImageList2.Images.SetKeyName(13, "icon-ppt.png")
+        Me.ImageList2.Images.SetKeyName(14, "icon-pptx.png")
+        Me.ImageList2.Images.SetKeyName(15, "icon-txt.png")
+        Me.ImageList2.Images.SetKeyName(16, "icon-xls.png")
+        Me.ImageList2.Images.SetKeyName(17, "icon-xlsx.png")
+        Me.ImageList2.Images.SetKeyName(18, "loading.png")
+        Me.ImageList2.Images.SetKeyName(19, "magnifier.png")
+        Me.ImageList2.Images.SetKeyName(20, "newfolder.png")
+        Me.ImageList2.Images.SetKeyName(21, "no.png")
+        Me.ImageList2.Images.SetKeyName(22, "refresh.png")
+        Me.ImageList2.Images.SetKeyName(23, "search.png")
+        Me.ImageList2.Images.SetKeyName(24, "trash.png")
+        Me.ImageList2.Images.SetKeyName(25, "untrash.png")
+        Me.ImageList2.Images.SetKeyName(26, "upload.png")
+        Me.ImageList2.Images.SetKeyName(27, "uploading.png")
+        Me.ImageList2.Images.SetKeyName(28, "yes.png")
         '
         'lvCuentas
         '
@@ -252,7 +294,7 @@ Partial Class VentuDrive
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(161, 86)
+        Me.Label2.Location = New System.Drawing.Point(240, 86)
         Me.Label2.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(48, 13)
@@ -261,7 +303,7 @@ Partial Class VentuDrive
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(243, 483)
+        Me.Button2.Location = New System.Drawing.Point(243, 538)
         Me.Button2.Margin = New System.Windows.Forms.Padding(2)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(118, 24)
@@ -271,7 +313,7 @@ Partial Class VentuDrive
         '
         'txtdirsubir
         '
-        Me.txtdirsubir.Location = New System.Drawing.Point(366, 457)
+        Me.txtdirsubir.Location = New System.Drawing.Point(366, 512)
         Me.txtdirsubir.Margin = New System.Windows.Forms.Padding(2)
         Me.txtdirsubir.Name = "txtdirsubir"
         Me.txtdirsubir.Size = New System.Drawing.Size(403, 20)
@@ -279,7 +321,7 @@ Partial Class VentuDrive
         '
         'txtcreardir
         '
-        Me.txtcreardir.Location = New System.Drawing.Point(366, 486)
+        Me.txtcreardir.Location = New System.Drawing.Point(366, 541)
         Me.txtcreardir.Margin = New System.Windows.Forms.Padding(2)
         Me.txtcreardir.Name = "txtcreardir"
         Me.txtcreardir.Size = New System.Drawing.Size(403, 20)
@@ -287,7 +329,7 @@ Partial Class VentuDrive
         '
         'SelDir
         '
-        Me.SelDir.Location = New System.Drawing.Point(772, 455)
+        Me.SelDir.Location = New System.Drawing.Point(772, 510)
         Me.SelDir.Margin = New System.Windows.Forms.Padding(2)
         Me.SelDir.Name = "SelDir"
         Me.SelDir.Size = New System.Drawing.Size(26, 24)
@@ -371,7 +413,7 @@ Partial Class VentuDrive
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(14, 522)
+        Me.Button3.Location = New System.Drawing.Point(14, 537)
         Me.Button3.Margin = New System.Windows.Forms.Padding(2)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(118, 24)
@@ -419,7 +461,7 @@ Partial Class VentuDrive
         '
         'btnrefres
         '
-        Me.btnrefres.Location = New System.Drawing.Point(15, 495)
+        Me.btnrefres.Location = New System.Drawing.Point(15, 510)
         Me.btnrefres.Margin = New System.Windows.Forms.Padding(2)
         Me.btnrefres.Name = "btnrefres"
         Me.btnrefres.Size = New System.Drawing.Size(118, 24)
@@ -429,16 +471,76 @@ Partial Class VentuDrive
         '
         'PBLIBRE
         '
-        Me.PBLIBRE.Location = New System.Drawing.Point(15, 467)
+        Me.PBLIBRE.Location = New System.Drawing.Point(12, 482)
         Me.PBLIBRE.Name = "PBLIBRE"
         Me.PBLIBRE.Size = New System.Drawing.Size(211, 23)
         Me.PBLIBRE.TabIndex = 22
+        '
+        'btnhome
+        '
+        Me.btnhome.BackgroundImage = CType(resources.GetObject("btnhome.BackgroundImage"), System.Drawing.Image)
+        Me.btnhome.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.btnhome.Location = New System.Drawing.Point(312, 455)
+        Me.btnhome.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnhome.Name = "btnhome"
+        Me.btnhome.Size = New System.Drawing.Size(60, 51)
+        Me.btnhome.TabIndex = 23
+        Me.btnhome.TextAlign = System.Drawing.ContentAlignment.BottomCenter
+        Me.btnhome.UseVisualStyleBackColor = True
+        '
+        'btndetras
+        '
+        Me.btndetras.BackgroundImage = CType(resources.GetObject("btndetras.BackgroundImage"), System.Drawing.Image)
+        Me.btndetras.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.btndetras.Location = New System.Drawing.Point(248, 455)
+        Me.btndetras.Margin = New System.Windows.Forms.Padding(2)
+        Me.btndetras.Name = "btndetras"
+        Me.btndetras.Size = New System.Drawing.Size(60, 51)
+        Me.btndetras.TabIndex = 24
+        Me.btndetras.TextAlign = System.Drawing.ContentAlignment.BottomCenter
+        Me.btndetras.UseVisualStyleBackColor = True
+        '
+        'btndelante
+        '
+        Me.btndelante.BackgroundImage = CType(resources.GetObject("btndelante.BackgroundImage"), System.Drawing.Image)
+        Me.btndelante.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.btndelante.Location = New System.Drawing.Point(376, 455)
+        Me.btndelante.Margin = New System.Windows.Forms.Padding(2)
+        Me.btndelante.Name = "btndelante"
+        Me.btndelante.Size = New System.Drawing.Size(60, 51)
+        Me.btndelante.TabIndex = 25
+        Me.btndelante.TextAlign = System.Drawing.ContentAlignment.BottomCenter
+        Me.btndelante.UseVisualStyleBackColor = True
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(12, 466)
+        Me.Label4.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(102, 13)
+        Me.Label4.TabIndex = 26
+        Me.Label4.Text = "Estado de la cuenta"
+        '
+        'lbllibre
+        '
+        Me.lbllibre.AutoSize = True
+        Me.lbllibre.Location = New System.Drawing.Point(118, 466)
+        Me.lbllibre.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lbllibre.Name = "lbllibre"
+        Me.lbllibre.Size = New System.Drawing.Size(0, 13)
+        Me.lbllibre.TabIndex = 27
         '
         'VentuDrive
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(839, 585)
+        Me.Controls.Add(Me.lbllibre)
+        Me.Controls.Add(Me.Label4)
+        Me.Controls.Add(Me.btndelante)
+        Me.Controls.Add(Me.btndetras)
+        Me.Controls.Add(Me.btnhome)
         Me.Controls.Add(Me.PBLIBRE)
         Me.Controls.Add(Me.btnrefres)
         Me.Controls.Add(Me.Button3)
@@ -518,4 +620,10 @@ Partial Class VentuDrive
     Friend WithEvents AyudaToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents CopiaBBDDToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents RestaurarBBDDToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ImageList2 As ImageList
+    Friend WithEvents btnhome As Button
+    Friend WithEvents btndetras As Button
+    Friend WithEvents btndelante As Button
+    Friend WithEvents Label4 As Label
+    Friend WithEvents lbllibre As Label
 End Class

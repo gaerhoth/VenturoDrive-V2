@@ -10,4 +10,6 @@ Public Class VAR_GLOBALES
     Public Shared MBUSADOS As Decimal
     Public Shared MBTOAL As Decimal
     Public Shared MBLIBRES As Decimal
+
+
 End Class
